@@ -80,6 +80,6 @@ echo ":: Tagging FLAC files from CUE file..."
 cuetag.sh ${v_basename}.cue track*.flac                             || exit
 
 echo ":: Cleaning..."
-pushd && mv ./${f_dir_working}/track*flac ./                        || exit
+pushd && mv ./${f_dir_working}/track*.flac ./                       || exit
 echo ":: Directory changed to $(pwd)"
 rm -fr ./${f_dir_working}

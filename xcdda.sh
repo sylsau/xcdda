@@ -61,7 +61,7 @@ if test $v_help -eq 1; then
 fi
 
 mkdir -v ./${f_dir_working} && pushd ./${f_dir_working}             || exit
-echo ":: Directory changed to `pwd`"
+echo ":: Directory changed to $(pwd)"
 
 echo ":: Getting TOC file..."
 cdrdao read-toc ${v_basename}.toc                                   || exit
@@ -81,5 +81,5 @@ cuetag.sh ${v_basename}.cue track*.flac                             || exit
 
 echo ":: Cleaning..."
 pushd && mv ./${f_dir_working}/track*flac ./                        || exit
-echo ":: Directory changed to `pwd`"
+echo ":: Directory changed to $(pwd)"
 rm -fr ./${f_dir_working}

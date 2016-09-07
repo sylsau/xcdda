@@ -1,5 +1,5 @@
 # xcdda
-Rip audio CD to fully tagged FLAC media files.  
+Rip audio CD to fully tagged FLAC media files (no internet connection required).  
 **Requires: cdrdao, cuetools, [SyS-ffmpeg-mass-conv.sh](https://github.com/ResponSySS/ffmpeg-mass-conv/)**  
 Shit's wonderful, use it, srsly.
 

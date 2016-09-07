@@ -5,10 +5,10 @@
 # 
 #         USAGE: ./SyS-xcdda.sh 
 # 
-#   DESCRIPTION: Rip audio CD to fully tagged FLAC media files.
+#   DESCRIPTION: Simple and efficient audio CD ripping and tagging tool. Rip audio CD to fully tagged FLAC media files.
 # 
 #       OPTIONS: ---
-#  REQUIREMENTS: cdrdao, cuetools, SyS-ffmpeg-mass-conv.sh
+#  REQUIREMENTS: cdrdao, cdparanoia, cuetools, SyS-ffmpeg-mass-conv.sh
 #          BUGS: ---
 #        AUTHOR: Sylvain Saubier (ResponSyS), mail@systemicresponse.com
 #       CREATED: 06/09/16 23:32
@@ -45,8 +45,8 @@ fi
 
 if test $v_help -eq 1; then
     echo
-    echo "Rip audio CD to fully tagged FLAC media files."
-    echo ">> Requires: cdrdao, cuetools, SyS-ffmpeg-mass-conv.sh"
+    echo "Simple and efficient audio CD ripping and tagging tool. Everything is done from the CD itself (no internet connection required)."
+    echo ">> Requires: cdrdao, cdparanoia, cuetools, SyS-ffmpeg-mass-conv.sh (https://github.com/ResponSySS/ffmpeg-mass-conv/)"
     echo "Shit's wonderful, use it, srsly."
     echo "Steps: "
     echo "   1. extract TOC file (cdrdao)"

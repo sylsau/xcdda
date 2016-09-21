@@ -19,7 +19,7 @@ v_help=0
 v_basename='audio'
 f_dir_working='XCDDA'
 f_list='list_wav.txt'
-f_script_conv='xcdda-conv.sh'
+#f_script_conv='xcdda-conv.sh'
 v_keep_files=0
 
 function fn_exit {

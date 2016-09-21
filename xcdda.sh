@@ -18,9 +18,14 @@
 v_help=0
 v_basename='audio'
 f_dir_working='XCDDA'
-f_list='list.txt'
+f_list='list_wav.txt'
 f_script_conv='xcdda-conv.sh'
+v_keep_files=0
 
+function fn_exit {
+    echo ":: Exiting..." > /dev/stderr
+    exit
+}
 
 if test -n "$*"; then
     # Individually check provided args
@@ -29,13 +34,15 @@ if test -n "$*"; then
             "-h"|"--help")
                 v_help=1
                 ;;
+            "-k"|"--keep-files")
+                v_keep_files=1
+                ;;
             "--wewlads")
                 while true; do echo -n "WEW LADS!  " ; sleep 0.05 ; done
                 ;;
             *)
-                echo ":: ERROR : Invalid argument: $1"
-                echo ":: Exiting..."
-                exit
+                echo ":: ERROR : Invalid argument: $1" > /dev/stderr
+                fn_exit
                 ;;
         esac	# --- end of case ---
         # Delete $1
@@ -56,30 +63,36 @@ if test $v_help -eq 1; then
     echo "   5. tag FLAC files from CUE file (cuetag.sh)"
     echo
     echo "Usage:"
-    echo "    $0"
+    echo "    $0 [-h|--help] [-k|--keep-files]"
     exit
 fi
 
-mkdir -v ./${f_dir_working} && pushd ./${f_dir_working}             || exit
+mkdir -v ./${f_dir_working} && pushd ./${f_dir_working} || exit
 echo ":: Directory changed to $(pwd)"
 
 echo ":: Getting TOC file..."
-cdrdao read-toc ${v_basename}.toc                                   || exit
+cdrdao read-toc ${v_basename}.toc || exit
 
 echo ":: Converting TOC file to CUE file..."
-cueconvert -i toc -o cue ${v_basename}.toc ${v_basename}.cue        || exit
+cueconvert -i toc -o cue ${v_basename}.toc ${v_basename}.cue || exit
 
 echo ":: Retrieving audio tracks from CDDA..."
-cdparanoia -B -L                                                    || exit 
+cdparanoia -B -L || exit 
 
 echo ":: Converting WAV tracks to FLAC..."
-ls track*.wav > ${f_list}                                      || exit
-/usr/local/bin/SyS-ffmpeg-mass-conv.sh ${f_list} -xi .wav -xo .flac -o ${f_script_conv} -e || exit
+ls track*.wav > ${f_list} || exit
+/usr/local/bin/SyS-ffmpeg-mass-conv.sh ${f_list} -xi .wav -xo .flac -e || exit
 
 echo ":: Tagging FLAC files from CUE file..."
-cuetag.sh ${v_basename}.cue track*.flac                             || exit
+cuetag.sh ${v_basename}.cue track*.flac || exit
 
-echo ":: Cleaning..."
-pushd && mv ./${f_dir_working}/track*.flac ./                       || exit
+pushd && mv ./${f_dir_working}/track*.flac ./ || exit
 echo ":: Directory changed to $(pwd)"
-rm -fr ./${f_dir_working}
+
+if test $v_keep_files -eq 0 ; then
+    echo ":: Cleaning..."
+    rm -fr ./${f_dir_working}
+else
+    echo ":: Files have been kept in directory ${f_dir_working}/"
+fi
+exit

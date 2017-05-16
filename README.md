@@ -13,4 +13,4 @@ Shit's wonderful, use it, srsly.
 
 ### Usage:
 
-`/usr/local/bin/SyS-xcdda.sh`
+`xcdda.sh`

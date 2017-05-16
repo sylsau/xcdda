@@ -13,4 +13,4 @@ Shit's wonderful, use it, srsly.
 
 ### Usage:
 
-`xcdda.sh`
+`./xcdda.sh`

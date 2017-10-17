@@ -42,8 +42,8 @@ fn_err() {
 }
 
 fn_help() {
-    cat 1>&2 << EOF
-$PROGRAM_NAME 20170917
+    cat << EOF
+$PROGRAM_NAME v20170917
 Simple and efficient audio CD ripping and tagging tool. Rip audio CD to fully tagged
 FLAC media files.
 

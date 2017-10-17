@@ -15,34 +15,82 @@
 #      REVISION:  ---
 #===============================================================================
 
-v_help=0
-v_basename='audio'
-f_dir_working='XCDDA'
-f_list='list_wav.txt'
-#f_script_conv='xcdda-conv.sh'
-v_keep_files=0
+PROGRAM_NAME="xcdda.sh"
 
-function fn_exit {
-    echo ":: Exiting..." > /dev/stderr
-    exit
+ERR_WRONG_ARG=10
+ERR_WRONG_ARG=30
+
+BASENAME='cdda'
+WORKDIR='XCDDA'
+LIST='list_wav.txt'
+KEEP_FILES=0
+
+# $1 = command to test (string)
+fn_needCmd() {
+    if ! command -v "$1" > /dev/null 2>&1
+    then fn_err "need '$1' (command not found)" $ERR_NO_CMD
+    fi
 }
+# $1 = message (string)
+m_say() {
+    echo -e "$PROGRAM_NAME: $1"
+}
+# $1 = error message (string), $2 = return code (int)
+fn_err() {
+    m_say "${FMT_BOLD}ERROR${FMT_OFF}: $1" >&2
+    exit $2
+}
+
+fn_help() {
+    cat 1>&2 << EOF
+$PROGRAM_NAME 20170917
+Simple and efficient audio CD ripping and tagging tool. Rip audio CD to fully tagged
+FLAC media files.
+
+REQUIREMENTS
+    cdrdao, cdparanoia, cuetools, ffmpeg-mass-conv.sh (<https://github.com/ResponSySS/ffmpeg-mass-conv/>)
+
+USAGE
+    $PROGRAM_NAME [-h|--help] [-k|--keep-files]
+
+HOW IT WORKS
+    1. extract TOC file (cdrdao)
+    2. convert TOC to CUE (cueconvert)
+    3. extract audio data to WAV files (cdparanoia)
+    4. convert WAV files to FLAC files (ffmpeg)
+    5. tag FLAC files from CUE file (cuetag.sh)
+
+AUTHOR
+    Written by Sylvain Saubier (<http://SystemicResponse.com>)
+
+REPORTING BUGS
+    Mail at: <feedback@systemicresponse.com>
+EOF
+}
+
+fn_needCmd "cdrdao"
+fn_needCmd "cueconvert"
+fn_needCmd "cdparanoia"
+fn_needCmd "ffmpeg"
+fn_needCmd "ffmpeg-mass-conv.sh"
+fn_needCmd "cuetag.sh"
 
 if test -n "$*"; then
     # Individually check provided args
     while test -n "$1" ; do
         case $1 in
             "-h"|"--help")
-                v_help=1
+                fn_help
+                exit
                 ;;
             "-k"|"--keep-files")
-                v_keep_files=1
+                KEEP_FILES=1
                 ;;
             "--wewlads")
                 while true; do echo -n "WEW LADS!  " ; sleep 0.05 ; done
                 ;;
             *)
-                echo ":: ERROR : Invalid argument: $1" > /dev/stderr
-                fn_exit
+                fn_err "invalid argument: $1" $ERR_WRONG_ARG
                 ;;
         esac	# --- end of case ---
         # Delete $1
@@ -50,49 +98,32 @@ if test -n "$*"; then
     done
 fi
 
-if test $v_help -eq 1; then
-    echo
-    echo "Simple and efficient audio CD ripping and tagging tool. Everything is done from the CD itself (no internet connection required)."
-    echo ">> Requires: cdrdao, cdparanoia, cuetools, ffmpeg-mass-conv.sh (https://github.com/ResponSySS/ffmpeg-mass-conv/)"
-    echo "Shit's wonderful, use it, srsly."
-    echo "Steps: "
-    echo "   1. extract TOC file (cdrdao)"
-    echo "   2. convert TOC to CUE (cueconvert)"
-    echo "   3. extract audio data to WAV files (cdparanoia)"
-    echo "   4. convert WAV files to FLAC files (ffmpeg)"
-    echo "   5. tag FLAC files from CUE file (cuetag.sh)"
-    echo
-    echo "Usage:"
-    echo "    $0 [-h|--help] [-k|--keep-files]"
-    exit
-fi
+mkdir -v ./${WORKDIR} && pushd ./${WORKDIR} || exit
+m_say "directory changed to $(pwd)"
 
-mkdir -v ./${f_dir_working} && pushd ./${f_dir_working} || exit
-echo ":: Directory changed to $(pwd)"
+m_say "getting TOC file..."
+cdrdao read-toc ${BASENAME}.toc || exit
 
-echo ":: Getting TOC file..."
-cdrdao read-toc ${v_basename}.toc || exit
+m_say "converting TOC file to CUE file..."
+cueconvert -i toc -o cue ${BASENAME}.toc ${BASENAME}.cue || exit
 
-echo ":: Converting TOC file to CUE file..."
-cueconvert -i toc -o cue ${v_basename}.toc ${v_basename}.cue || exit
-
-echo ":: Retrieving audio tracks from CDDA..."
+m_say "retrieving audio tracks from CDDA..."
 cdparanoia -B -L || exit 
 
-echo ":: Converting WAV tracks to FLAC..."
-ls track*.wav > ${f_list} || exit
-ffmpeg-mass-conv.sh ${f_list} -xi .wav -xo .flac -e || exit
+m_say "converting WAV tracks to FLAC..."
+ls -x --color=never track*.wav > ${LIST} || exit
+ffmpeg-mass-conv.sh ${LIST} -xi .wav -xo .flac -e || exit
 
-echo ":: Tagging FLAC files from CUE file..."
-cuetag.sh ${v_basename}.cue track*.flac || exit
+m_say "tagging FLAC files from CUE file..."
+cuetag.sh ${BASENAME}.cue track*.flac || exit
 
-pushd && mv ./${f_dir_working}/track*.flac ./ || exit
-echo ":: Directory changed to $(pwd)"
+pushd && mv ./${WORKDIR}/track*.flac ./ || exit
+m_say "directory changed to $(pwd)"
 
-if test $v_keep_files -eq 0 ; then
-    echo ":: Cleaning..."
-    rm -fr ./${f_dir_working}
+if test $KEEP_FILES -eq 0 ; then
+    m_say "cleaning..."
+    rm -fr ./${WORKDIR}
 else
-    echo ":: Files have been kept in directory ${f_dir_working}/"
+    m_say "files have been kept in directory \"${WORKDIR}\"/"
 fi
 exit

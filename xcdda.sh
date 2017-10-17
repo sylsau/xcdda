@@ -5,7 +5,7 @@
 # 
 #         USAGE: ./xcdda.sh 
 # 
-#   DESCRIPTION: Simple and efficient audio CD ripping and tagging tool. Rip audio CD to fully tagged FLAC media files.
+#   DESCRIPTION: Simple and efficient audio CD ripping and tagging tool. Rip audio CD to fully tagged FLAC media files without using the internet.
 # 
 #       OPTIONS: ---
 #  REQUIREMENTS: cdrdao, cdparanoia, cuetools, ffmpeg-mass-conv.sh
@@ -45,7 +45,7 @@ fn_help() {
     cat << EOF
 $PROGRAM_NAME v20170917
 Simple and efficient audio CD ripping and tagging tool. Rip audio CD to fully tagged
-FLAC media files.
+FLAC media files without using the internet.
 
 REQUIREMENTS
     cdrdao, cdparanoia, cuetools, ffmpeg-mass-conv.sh (<https://github.com/ResponSySS/ffmpeg-mass-conv/>)

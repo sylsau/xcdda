@@ -5,7 +5,7 @@
 # 
 #         USAGE: ./xcdda.sh 
 # 
-#   DESCRIPTION: Simple and efficient audio CD ripping and tagging tool. Rip audio CD to fully tagged FLAC media files without using the internet.
+#   DESCRIPTION: Simple and efficient audio CD ripping and tagging tool. Rip audio CD to fully tagged FLAC media files without using the internet. Output to current directory.
 # 
 #       OPTIONS: ---
 #  REQUIREMENTS: cdrdao, cdparanoia, cuetools, ffmpeg-mass-conv.sh
@@ -15,7 +15,9 @@
 #      REVISION:  ---
 #===============================================================================
 
-PROGRAM_NAME="xcdda.sh"
+PROGRAM_NAME="${0##*/}"
+SCRIPT_NAME="${0##*/}"
+VERSION="2018.02.01"
 
 ERR_WRONG_ARG=10
 ERR_WRONG_ARG=30
@@ -43,9 +45,9 @@ fn_err() {
 
 fn_help() {
     cat << EOF
-$PROGRAM_NAME v20170917
+$PROGRAM_NAME v${VERSION}
 Simple and efficient audio CD ripping and tagging tool. Rip audio CD to fully tagged
-FLAC media files without using the internet.
+FLAC media files without using the internet. Output to current directory.
 
 REQUIREMENTS
     cdrdao, cdparanoia, cuetools, ffmpeg-mass-conv.sh (<https://github.com/ResponSySS/ffmpeg-mass-conv/>)
@@ -111,7 +113,7 @@ m_say "retrieving audio tracks from CDDA..."
 cdparanoia -B -L || exit 
 
 m_say "converting WAV tracks to FLAC..."
-ls -x --color=never track*.wav > ${LIST} || exit
+ls -x1 --color=never track*.wav > ${LIST} || exit
 ffmpeg-mass-conv.sh ${LIST} -xi .wav -xo .flac -e || exit
 
 m_say "tagging FLAC files from CUE file..."

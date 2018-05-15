@@ -8,27 +8,29 @@
 #   DESCRIPTION: Simple and efficient audio CD ripping and tagging tool. Rip audio CD to fully tagged FLAC media files without using the internet. Output to current directory.
 # 
 #       OPTIONS: ---
-#  REQUIREMENTS: cdrdao, cdparanoia, cuetools, ffmpeg-mass-conv.sh
+#  REQUIREMENTS: cdrdao, cdparanoia, cuetools, ffmpeg-bulk.sh
 #          BUGS: ---
-#        AUTHOR: Sylvain Saubier (ResponSyS), mail@systemicresponse.com
+#        AUTHOR: Sylvain Saubier (ResponSyS), mail@sylsau.com
 #       CREATED: 06/09/16 23:32
-#      REVISION:  ---
 #===============================================================================
 
-PROGRAM_NAME="${0##*/}"
-SCRIPT_NAME="${0##*/}"
-VERSION="2018.02.01"
+readonly PROGRAM_NAME="${0##*/}"
+readonly SCRIPT_NAME="${0##*/}"
+readonly VERSION="2018.02.01"
 
-ERR_WRONG_ARG=10
-ERR_WRONG_ARG=30
+# Path to ffmpeg-bulk.sh script
+readonly FFMPEG_BULK=${FFMPEG_BULK:-$HOME/Devel/Src/Bash/ffmpeg-bulk/ffmpeg-bulk.sh}
 
-BASENAME='cdda'
-WORKDIR='XCDDA'
+readonly ERR_NO_CMD=10
+readonly ERR_WRONG_ARG=30
+
+readonly BASENAME='cdda'
+readonly WORKDIR='XCDDA'
 LIST='list_wav.txt'
 KEEP_FILES=0
 
 # $1 = command to test (string)
-fn_needCmd() {
+fn_need_cmd() {
     if ! command -v "$1" > /dev/null 2>&1
     then fn_err "need '$1' (command not found)" $ERR_NO_CMD
     fi
@@ -50,7 +52,7 @@ Simple and efficient audio CD ripping and tagging tool. Rip audio CD to fully ta
 FLAC media files without using the internet. Output to current directory.
 
 REQUIREMENTS
-    cdrdao, cdparanoia, cuetools, ffmpeg-mass-conv.sh (<https://github.com/ResponSySS/ffmpeg-mass-conv/>)
+    cdrdao, cdparanoia, cuetools, ffmpeg-bulk (<https://github.com/ResponSySS/ffmpeg-bulk/>)
 
 USAGE
     $PROGRAM_NAME [-h|--help] [-k|--keep-files]
@@ -66,16 +68,16 @@ AUTHOR
     Written by Sylvain Saubier (<http://SystemicResponse.com>)
 
 REPORTING BUGS
-    Mail at: <feedback@systemicresponse.com>
+    Mail at: <feedback@sylsau.com>
 EOF
 }
 
-fn_needCmd "cdrdao"
-fn_needCmd "cueconvert"
-fn_needCmd "cdparanoia"
-fn_needCmd "ffmpeg"
-fn_needCmd "ffmpeg-mass-conv.sh"
-fn_needCmd "cuetag.sh"
+fn_need_cmd "cdrdao"
+fn_need_cmd "cueconvert"
+fn_need_cmd "cdparanoia"
+fn_need_cmd "ffmpeg"
+fn_need_cmd "${FFMPEG_BULK}"
+fn_need_cmd "cuetag.sh"
 
 if test -n "$*"; then
     # Individually check provided args

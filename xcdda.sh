@@ -14,6 +14,10 @@
 #       CREATED: 06/09/16 23:32
 #===============================================================================
 
+[[ $DEBUG ]] && set -o nounset
+set -o pipefail -o errexit -o errtrace
+trap 'echo -e "ERROR: at $FUNCNAME:$LINENO"' ERR
+
 readonly PROGRAM_NAME="${0##*/}"
 readonly SCRIPT_NAME="${0##*/}"
 readonly VERSION="2018.02.01"
@@ -102,26 +106,26 @@ if test -n "$*"; then
     done
 fi
 
-mkdir -v ./${WORKDIR} && pushd ./${WORKDIR} || exit
+mkdir -v ./${WORKDIR} && pushd ./${WORKDIR}
 m_say "directory changed to $(pwd)"
 
 m_say "getting TOC file..."
 cdrdao read-toc ${BASENAME}.toc || exit
 
 m_say "converting TOC file to CUE file..."
-cueconvert -i toc -o cue ${BASENAME}.toc ${BASENAME}.cue || exit
+cueconvert -i toc -o cue ${BASENAME}.toc ${BASENAME}.cue
 
 m_say "retrieving audio tracks from CDDA..."
-cdparanoia -B -L || exit 
+cdparanoia -B -L
 
 m_say "converting WAV tracks to FLAC..."
-ls -x1 --color=never track*.wav > ${LIST} || exit
-ffmpeg-mass-conv.sh ${LIST} -xi .wav -xo .flac -e || exit
+ls -x1 --color=never track*.wav > ${LIST}
+ffmpeg-bulk.sh ${LIST} -xi .wav -xo .flac -e
 
 m_say "tagging FLAC files from CUE file..."
-cuetag.sh ${BASENAME}.cue track*.flac || exit
+cuetag.sh ${BASENAME}.cue track*.flac
 
-pushd && mv ./${WORKDIR}/track*.flac ./ || exit
+pushd && mv ./${WORKDIR}/track*.flac ./
 m_say "directory changed to $(pwd)"
 
 if test $KEEP_FILES -eq 0 ; then

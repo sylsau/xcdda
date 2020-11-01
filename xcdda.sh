@@ -16,7 +16,7 @@
 
 [[ $DEBUG ]] && set -o nounset
 set -o pipefail -o errexit -o errtrace
-trap 'echo -e "ERROR: at $FUNCNAME:$LINENO"' ERR
+trap 'echo -e "ERROR: at ${FUNCNAME:-top level}:$LINENO"' ERR
 
 readonly PROGRAM_NAME="${0##*/}"
 readonly SCRIPT_NAME="${0##*/}"
@@ -69,7 +69,7 @@ HOW IT WORKS
     5. tag FLAC files from CUE file (cuetag.sh)
 
 AUTHOR
-    Written by Sylvain Saubier (<http://SystemicResponse.com>)
+    Written by Sylvain Saubier (<https://sylsau.com>)
 
 REPORTING BUGS
     Mail at: <feedback@sylsau.com>
@@ -106,7 +106,8 @@ if test -n "$*"; then
     done
 fi
 
-mkdir -v ./${WORKDIR} && pushd ./${WORKDIR}
+mkdir -v ./${WORKDIR}
+pushd ./${WORKDIR}
 m_say "directory changed to $(pwd)"
 
 m_say "getting TOC file..."

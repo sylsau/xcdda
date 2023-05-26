@@ -1,0 +1,25 @@
+xcdda.sh v20230526
+Simple and efficient audio CD ripping and tagging tool. Rip audio CD to fully tagged
+FLAC media files without using the internet. Output to current directory.
+
+REQUIREMENTS
+	cdrdao, cdparanoia, cuetools, ffmpeg
+
+USAGE
+	xcdda.sh [-h|--help] [-k|--keep-files] [-f|--format FORMAT] [-b|--bitrate BITRATE]
+
+		FORMAT 		Final output formats of the tracks (default: flac)
+		BITRATE 	Bitrate of output tracks, in the format (NUMBER)k (default: 1000k)
+
+HOW IT WORKS
+	1. extract TOC file (cdrdao)
+	2. convert TOC to CUE (cueconvert)
+	3. extract audio data to WAV files (cdparanoia)
+	4. convert WAV files to format of your choice (ffmpeg)
+	5. tag FLAC files from CUE file (cuetag)
+
+AUTHOR
+	Written by Sylvain Saubier (<https://sylsau.com>)
+
+REPORTING BUGS
+	Mail at: <feedback@sylsau.com>
